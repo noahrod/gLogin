@@ -12,7 +12,6 @@ You came to the right place.
 **Instalation**
 
 1. Download libraries module ( drush en libraries )
-2. Download Google APIs Client Library for PHP in tour libraries directory (sites/all/libraries) 
    git clone https://github.com/google/google-api-php-client.git
 3. Enable the gLogin Module
 4. Don't forget the configuration of your Client ID, Client Secret and domain (admin/config/services/glogin)
