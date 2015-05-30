@@ -28,7 +28,7 @@ function glogin_user_login_submit() {
 	include_once $oauth_platform;
 	$client_id= variable_get('glogin_client_id');
 	$client_secret= variable_get('glogin_client_secret');
-	$redirect_uri= "http://drupaltestapp.gq/glogin/oauth2callback";
+	$redirect_uri= base_path() . "glogin/oauth2callback";
 	$client = new Google_Client();
 	$client->setClientId($client_id);
 	$client->setClientSecret($client_secret);
@@ -75,7 +75,7 @@ function glogin_google_response() {
 	include_once $oauth_platform;
 	$client_id= variable_get('glogin_client_id');
 	$client_secret= variable_get('glogin_client_secret');
-	$redirect_uri= "http://drupaltestapp.gq/glogin/oauth2callback";
+	$redirect_uri= base_path() . "glogin/oauth2callback";
 	$client = new Google_Client();
 	$client->setClientId($client_id);
 	$client->setClientSecret($client_secret);
