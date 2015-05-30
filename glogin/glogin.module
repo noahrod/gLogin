@@ -42,7 +42,7 @@ function glogin_user_login_submit() {
 }
 
 /*
-	Código que crea el listening de "glogin/oauth2callback"
+	Código que crea el listening de "glogin/oauth2callback" para el Oauth2 y el listening de "admin/config/services/glogin" para la pantalla de configuración
 	hook_menu();
 */
 
