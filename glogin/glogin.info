@@ -1,6 +1,6 @@
 ; $Id$
 name = Google UP Login
-description = Acceso por OAuth2 desde Google Apps para cuentas de la UP
+description = Acceso por OAuth2 desde un dominio específico de Google Apps
 package = "glogin"
 core = 7.x
 dependencies[] = libraries
