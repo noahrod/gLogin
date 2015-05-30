@@ -55,7 +55,7 @@ function glogin_menu() {
 	  );
 	$items['admin/config/services/glogin'] = array(
 		'title' => 'Google Apps Login',
-		'description' => 'Configuración de la aplicación de Google para el Oauth2',
+		'description' => t('Configuración de la aplicación de Google para el Oauth2'),
 		'page callback'    => 'drupal_get_form',
 		'page arguments' => array('glogin_settings'),
 		'access arguments' => array('administer site configuration'),
@@ -93,7 +93,7 @@ function glogin_google_response() {
 			if(!$new_user = user_load_by_mail($info['email'])){
 				$user = new stdClass();
 				$user->mail = $info['email'];
-				$user->name = ($info['name'] != "" ? $info['name'] : "Sin nombre");
+				$user->name = ($info['name'] != "" ? $info['name'] : t("Sin nombre"));
 				$user->is_new = TRUE;
 				$user->status = 1;
 				$new_user = user_save($user);
@@ -102,7 +102,7 @@ function glogin_google_response() {
 			user_login_submit(array(), $form_state);
 			global $user;
 		}else{
-			drupal_set_message('Lo sentimos sólo se permite el loggeo desde cuentas Google del dominio <b>'.variable_get('glogin_domain').'</b>','error');
+			drupal_set_message(t('Lo sentimos sólo se permite el loggeo desde cuentas Google del dominio '). '<b>' . variable_get('glogin_domain'). '</b>','error');
 		}
 		drupal_goto();
 	}
