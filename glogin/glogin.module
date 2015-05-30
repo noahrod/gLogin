@@ -1,0 +1,110 @@
+<?php
+/*
+   Se agrega la opción de loggeo con Google al formulario de Login
+   hook_form_alter()
+*/
+
+function glogin_form_alter(&$form,&$form_state,&$form_id){
+	if ($form_id == 'user_login' || $form_id == 'user_login_block') {
+		$form['submit_google_apps'] = array(
+		      '#type' => 'submit',
+		      '#value' => '<i class="fa fa-google-plus"></i>',
+		      '#submit' => array('glogin_user_login_submit'),
+		      '#limit_validation_errors' => array(),
+		      '#weight' => 1000,
+			  '#attributes' => array('class' => array('onl_btn-google-plus')),
+    		);
+    	drupal_add_css(drupal_get_path('module', 'glogin') . '/glogin.css');
+	}
+}
+
+/*
+	Código que maneja el loggeo a Google cuando el usuario elige esta opción
+	hook_user_login_submit();
+*/
+
+function glogin_user_login_submit() {
+	$oauth_platform = libraries_get_path('google-api-php-client') . '/src/Google/Auth/OAuth2.php';
+	include_once $oauth_platform;
+	$client_id= variable_get('glogin_client_id');
+	$client_secret= variable_get('glogin_client_secret');
+	$redirect_uri= "http://drupaltestapp.gq/glogin/oauth2callback";
+	$client = new Google_Client();
+	$client->setClientId($client_id);
+	$client->setClientSecret($client_secret);
+	$client->setRedirectUri($redirect_uri);
+	$client->setScopes(array("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"));
+	$url = $client->createAuthUrl();
+	if (isset($_GET['destination'])) {
+      unset($_GET['destination']);
+    }
+	drupal_goto($url);
+}
+
+/*
+	Código que crea el listening de "glogin/oauth2callback"
+	hook_menu();
+*/
+
+function glogin_menu() {
+	$items = array();
+	$items['glogin/oauth2callback'] = array(
+		'page callback' => 'glogin_google_response',
+		'access callback' => TRUE,
+		'type' => MENU_CALLBACK,
+	  );
+	$items['admin/config/services/glogin'] = array(
+		'title' => 'Google Apps Login',
+		'description' => 'Configuración de la aplicación de Google para el Oauth2',
+		'page callback'    => 'drupal_get_form',
+		'page arguments' => array('glogin_settings'),
+		'access arguments' => array('administer site configuration'),
+		'file' => 'glogin.admin.inc',
+	 );
+	return $items;
+}
+
+/*
+	Código que genera el token y conecta con la información de usuarios local en drupal
+	glogin_google_response()
+*/
+
+
+function glogin_google_response() {
+	$oauth_platform = libraries_get_path('google-api-php-client') . '/src/Google/Auth/OAuth2.php';
+	include_once $oauth_platform;
+	$client_id= variable_get('glogin_client_id');
+	$client_secret= variable_get('glogin_client_secret');
+	$redirect_uri= "http://drupaltestapp.gq/glogin/oauth2callback";
+	$client = new Google_Client();
+	$client->setClientId($client_id);
+	$client->setClientSecret($client_secret);
+	$client->setRedirectUri($redirect_uri);
+	$client->setScopes(array("https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"));
+	$user_token = "";
+	if (isset($_GET['code'])) {
+		$client->authenticate($_GET['code']);
+		$user_token = $client->getAccessToken();
+		$client->setAccessToken($user_token);
+		$oauth = new Google_Service_Oauth2($client);
+		$info = $oauth->userinfo->get();
+		$domain_name = substr(strrchr($info['email'], "@"), 1);
+		if($domain_name== variable_get('glogin_domain')){
+			if(!$new_user = user_load_by_mail($info['email'])){
+				$user = new stdClass();
+				$user->mail = $info['email'];
+				$user->name = ($info['name'] != "" ? $info['name'] : "Sin nombre");
+				$user->is_new = TRUE;
+				$user->status = 1;
+				$new_user = user_save($user);
+			}
+			$form_state['uid'] = $new_user->uid;
+			user_login_submit(array(), $form_state);
+			global $user;
+		}else{
+			drupal_set_message('Lo sentimos sólo se permite el loggeo desde cuentas Google del dominio <b>'.variable_get('glogin_domain').'</b>','error');
+		}
+		drupal_goto();
+	}
+}
+

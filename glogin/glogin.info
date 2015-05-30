@@ -1,0 +1,8 @@
+; $Id$
+name = Google UP Login
+description = Acceso por OAuth2 desde Google Apps para cuentas de la UP
+package = "glogin"
+core = 7.x
+dependencies[] = libraries
+version = 7.x-1.0
+configure = admin/config/services/glogin
