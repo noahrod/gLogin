@@ -16,6 +16,7 @@ You came to the right place.
    git clone https://github.com/google/google-api-php-client.git
 3. Enable the gLogin Module
 4. Don't forget the configuration of your Client ID, Client Secret and domain (admin/config/services/glogin)
+   https://console.developers.google.com/project
 5. Enjoy
 
 
